@@ -1,5 +1,5 @@
 import React,{useState,useEffect} from 'react'
-import HeadAdmin from './HeadAdmin'
+import HeadOwner from './HeadOwner'
 import axios from 'axios'
 import { motion, useScroll } from "motion/react"
 import terrain from '../images/sassi.jpg';
@@ -33,7 +33,7 @@ function AllFields() {
 
   return (
     <div className='AllFields'>
-        <HeadAdmin/>
+        <HeadOwner/>
         <motion.div id="scroll-indicator" style={{scaleX: scrollYProgress,position: "fixed",top: 0,left: 0,right: 0, height: 10, originX: 0, backgroundColor: "black",}} />
         <div className='typeFields'>
           <div className='towbt'>

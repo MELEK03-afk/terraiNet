@@ -1,41 +1,52 @@
 import React,{useState} from 'react'
-import HeadAdmin from './HeadAdmin'
+import HeadAdmin from './HeadAdmin.jsx'
 import toast, { Toaster, } from 'react-hot-toast';
 
 import axios from 'axios'
 function AddTerrains() {
   const [title,setTitle]=useState('')
   const [city,setCity]=useState('')
-  const [statu,setStatu]=useState('')
+  const [status,setStatu]=useState('')
   const [address,setAddress]=useState('')
   const [type,setType]=useState('')
   const [capacity,setCapacity]=useState('')
   const [price,setPrice]=useState('')
-
+  const user = JSON.parse(localStorage.getItem('user'));
+  
   const AddTerrains= async()=>{
     console.log(title);
     console.log(city);
-    console.log(statu);
+    console.log(status);
     console.log(address);
     console.log(type);
     console.log(capacity);
     console.log(price);
+    console.log(user);
     
     try {
-      const res= await axios.post('http://localhost:2024/api/owner/add-field',{
+      const res= await axios.post('http://localhost:2024/api/Owner/add-field',{
         title,
         city,
-        statu,
+        status,
         address,
         type,
         capacity,
         price,
-      })
+        owner : user.id
+      },
+      {
+        headers : {
+          Authorization : `Bearer ${user.token}`
+        }
+      }
+    
+    )
       if(res.status === 201){
         toast.success("Terrain created ")
       }
          } catch (error) {
-      
+          console.log(error);
+          
     }
   }
   return (
@@ -73,8 +84,8 @@ function AddTerrains() {
                 <div className='form1'>
                   <select name="Status" onChange={(e)=>setStatu(e.target.value)} placeholder="">
                     <option value="" >Status</option>
-                    <option value="availabel">Availebal</option>
-                    <option value="notAvailable">Not Availebal</option>
+                    <option value="Available">Availebal</option>
+                    <option value="Not Available">Not Availebal</option>
                   </select>
                 </div>
                 <div className='form1'>

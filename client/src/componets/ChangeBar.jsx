@@ -10,7 +10,7 @@ import pic5 from '../images/pic5.jpg'
 import { FaXTwitter } from "react-icons/fa6";
 import { FaInstagram } from "react-icons/fa6";
 import { CiFacebook } from "react-icons/ci";
-const backgrounds = [pic8,pic1, pic2, pic3,pic4,pic5];
+const backgrounds = [pic3,pic1, pic8,pic5];
 
 function ChangeBar({}) {
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -48,16 +48,6 @@ function ChangeBar({}) {
                 The Leading Online Software Solution for Booking, Payments, Facility Management, Events, Leagues, and more                </h2>
             </div>
         </div>
-        
-      {/* <footer>
-       <h1>terrainNet</h1>
-       <Link>Contact</Link>
-        <div className='navbar-2'>
-            <a href="https://www.instagram.com/esseketmelek/">{insta}</a>
-            <a href="">{x}</a>
-            <a href="https://www.facebook.com/melek.esseket/">{fc}</a>
-        </div>
-      </footer> */}
     </div>
   )
 }

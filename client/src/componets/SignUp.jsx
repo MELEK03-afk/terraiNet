@@ -21,12 +21,14 @@ function SignUp() {
   const [phoneNumber,setPhoneNumber]=useState('')
   const [email,setEmail]=useState('')
   const [password,setPassword]=useState('')
+  
   const navigate=useNavigate()
   const displayForm= ()=>{
     if (showForm === false) {
           
           return(
           <div className='signup'>
+            <Toaster   containerStyle={{ marginTop: "5%" }}/>
             <h2>Create Your Account</h2>
             <input type="text" placeholder='fullName' onChange={(e)=>setFullName(e.target.value)} className='inputsignup' />
             <p className='error'>{fullNameErr}</p>
@@ -43,9 +45,12 @@ function SignUp() {
     else{
       return(
           <div className='signup'>
+            <Toaster   containerStyle={{ marginTop: "5%" }}/>
             <h2>Create Your Account</h2>
             <input type="text" placeholder='E-mail' onChange={(e)=>setEmail(e.target.value)} style={{marginTop:"17%"}} className='inputsignin' />
+            <p className='error'>{emaildErr} </p>
             <input type="password" placeholder='Password' onChange={(e)=>setPassword(e.target.value)} className='inputsignin' />
+            <p className='error'>{passwordErr} </p>
             <button className='btsignin' onClick={singIn}>Sign In</button>
             <h5 style={{color:" rgb(184, 183, 183)"}}>{showForm ? 'You don"t have Account?' : 'Already have Account?'} <Link style={{color:'black'}} onClick={() => setShowForm(!showForm)}>{showForm ? 'SignUp' : 'SignIn'}</Link></h5>
           </div>
@@ -57,14 +62,20 @@ function SignUp() {
     var pattern = /^\d+\.?\d*$/;
     return pattern.test(phoneNumber);  // returns a boolean
 }
+
+const isValidS = () => {
+  if(!fullName || !email || !password || !phoneNumber ){
+    return false
+
+}
+return true
+}
+
   const signUp= async()=>{
-    console.log(email)
-    console.log(fullName)
-    console.log(phoneNumber)
-    console.log(password)
-    if(!fullName || !email || !password || !phoneNumber ){
-      toast.error(`All fialds are required`)
-    }
+
+    // if(!fullName || !email || !password || !phoneNumber ){
+    //   toast.error(`All fialds are required`)
+    // }
     var checkPhone = isNumber(phoneNumber)
     if (!fullName.trim() || fullName.length<0) {
       setfullNameErr(
@@ -101,81 +112,108 @@ function SignUp() {
     else{
       setemaildErr('')   }
 
-    try {
-      const res= await axios.post('http://localhost:2024/api/signUp',{
-        fullName,
-        email,
-        phoneNumber,
-        password
-      })
-      switch (res.status) {
-        case 201:
-          toast.success("Account created successfully");
+      try {
+
+        if(isValidS()){        
+          const res = await axios.post('http://localhost:2024/api/signUp', {
+            fullName,
+            email,
+            phoneNumber,
+            password,
+          });
+          
+          if (res.status === 201) {
+            toast.success("Account created successfully");
+            localStorage.setItem('user', JSON.stringify(res.data));
+            setTimeout(() => {
+              navigate("/");
+              window.location.reload();
+            }, 1000);
+      
+            // Clear form
+            setEmail('');
+            setFullName('');
+            setPhoneNumber('');
+            setPassword('');
+          } 
+        }
+        else{
+          toast.error(`All fialds are required`)
+        }
+    
+      } catch (error) {
+        console.error(error);
+        if (error.status != 200) {
+          toast.error(error.response?.data?.message || 'Server error occurred');
+        }      }
+  }
+
+
+const isValid = () => {
+  if(!email || !password){
+    return false
+
+}
+return true
+}
+
+
+  const singIn= async()=>{
+    try {      
+      console.log(isValid())
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+        setemaildErr(
+          < >
+            Invalid Email <MdErrorOutline />
+          </>
+      );}
+      if (password.length < 6) {
+        setpasswordErr(
+          < >
+            Invalid password <MdErrorOutline />
+          </>
+      );}
+      if(isValid()){
+        const res= await axios.post('http://localhost:2024/api/signIn',{
+          email,
+          password
+        })
+  
+        console.log(res.status)
+        if(res.status === 200){
+          toast.success("Wlecome back")
           localStorage.setItem('user' , JSON.stringify(res.data))
           setTimeout(() => {
-            navigate("/");
-            window.location.reload()}
-          , 1000);
-          email('')
-          fullName('')
-          phoneNumber('')
-          password('')
-          break;
-    
-        case 202:
-          toast.error("This email address is already in use");
-          break;
-        case 203:
-          toast.error("This phoneNumber is already in use");
-          setPhoneNumberErr(
-            < >
-              Invalid Phone Number <MdErrorOutline />
-            </>
-          ); 
-          break;
-    
-        case 200:
-          toast.error(data.message || "Verify email or password");
-          break;
-    
-        default:
-          toast.error("An unexpected error occurred. Please try again.");
+            navigate('/')
+            window.location.reload()
+          }, 1000);
+        }
+
+      } else{
+        toast.error('All fields are required')
       }
     } catch (error) {
-      console.log(error)
-    }
-  }
-  const singIn= async()=>{
-    try {
-      console.log(password);
-      console.log(email);
-      
-      if(!email || !password){
-        toast.error("All fields are required")
+      console.error(error);
+      if (error.status != 200) {
+        
+        toast.error(error.response?.data?.message || 'Server error occurred');
       }
-      const res= await axios.post('http://localhost:2024/api/signIn',{
-        email,
-        password
-      })
-     
-      if(res.status === 200){
-        toast.success("Wlecome back")
-        localStorage.setItem('user' , JSON.stringify(res.data))
-        setTimeout(() => {
-          navigate('/')
-        }, 1000);
-      }
-    } catch (error) {
-      console.log(error)
 
     }
   }
+
+
+
+
   return (
+    
     <div className='backline'>
-      <motion.div variants={pageVariants}  initial="initial" animate="animate" exit="exit" >
-        <Toaster   containerStyle={{ marginTop: "5%" }}/>
+      <div className='backline-2'>
+
+      </div>
+      {/* <motion.div variants={pageVariants}   initial="initial" animate="animate" exit="exit" > */}
         {displayForm()}
-        </motion.div>
+      {/* </motion.div> */}
     </div>
   )
 }

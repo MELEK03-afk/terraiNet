@@ -4,7 +4,7 @@ import cors from "cors"
 import connectToMongoose from './config/DBconfig.js'
 import commonRouter from './router/commonRouter.js'
 import ownerRouter from './router/ownerRoutes.js'
-
+import AdminRouter from './router/adminRouter.js'
 const port=process.env.PORT
 
 const app=express()
@@ -13,7 +13,8 @@ connectToMongoose()
 app.use(cors())
 
 app.use('/api',commonRouter)
-app.use('/api/owner',ownerRouter)
+app.use('/api/Owner',ownerRouter)
+app.use('/api/Admin',AdminRouter)
 
 app.listen(port,()=>{
     console.log(`server is running on port ${port}`.blue.underline)

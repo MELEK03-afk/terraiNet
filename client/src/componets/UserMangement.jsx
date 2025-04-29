@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from "react";
-import ownerHead from "./HeadAdmin.jsx";
 import axios from "axios";
 import { MdDelete } from "react-icons/md";
 import { CiEdit } from "react-icons/ci";
@@ -8,7 +7,8 @@ import { FaSearch } from "react-icons/fa";
 import { IoIosClose } from "react-icons/io";
 import { animate, motion, useMotionValue, useTransform } from "framer-motion";
 import { ScaleLoader } from "react-spinners"; // Import ScaleLoader
-import HeadAdmin from "./HeadAdmin.jsx";
+import HeadAdmin from "./HeadAdmin";
+import { Check } from "lucide-react";
 
 function ManegementPrd() {
   const [Users, setUsers] = useState([]);
@@ -17,12 +17,17 @@ function ManegementPrd() {
   const [updatedName, setUpdatedName] = useState('');
   const [role, setRole] = useState('');
   const [loading, setLoading] = useState(true); // State for loading
+  const user = JSON.parse(localStorage.getItem('user'));
 
   // Function to fetch users
   const getUser = async () => {
   
     try {
-      const res = await axios.get("http://localhost:2024/api/owner/getUsers");
+      const res = await axios.get("http://localhost:2024/api/Admin/getUsers",{
+        headers: {
+          'Authorization': `Bearer ${user.token}`
+          }
+      });
       setUsers(res.data);
 
       // Delay hiding loader for 3 seconds
@@ -37,11 +42,15 @@ function ManegementPrd() {
   // Function to update a user
   const updateUser = async(id) => {
     try {
-        console.log(role);
+        console.log(id);
         if (role == '') {
           return toast.error('select new role or close')
         }
-      const res = await axios.put(`http://localhost:2024/api/owner/Update-User/${id}`, { role });
+      const res = await axios.put(`http://localhost:2024/api/Admin/Update-User/${id}`,{
+        headers: {
+          'Authorization': `Bearer ${user.token}`
+          }
+      });
       if(res.status === 200) {
         toast.success('User Updated');
         setEditMode(null)
@@ -49,7 +58,11 @@ function ManegementPrd() {
         getUser();
       }
     } catch (error) {
-      console.log(error);
+      console.error(error);
+      if (error.status != 200) {
+        
+        toast.error(error.response?.data?.message || 'Server error occurred');
+      }
     }
   };
 
@@ -78,14 +91,22 @@ function ManegementPrd() {
 
   const confirmDelete = async (id, toastId) => {
     try {
-      const res = await axios.delete(`http://localhost:2024/api/owner/deleteUser/${id}`);
+      const res = await axios.delete(`http://localhost:2024/api/Admin/deleteUser/${id}`,{
+        headers: {
+          'Authorization': `Bearer ${user.token}`
+          }
+      });
       if (res.status === 200) {
         toast.dismiss(toastId);
         toast.success("User deleted successfully!");
         getUser();
       }
     } catch (error) {
-      toast.error("Error deleting user.");
+      console.error(error);
+      if (error.status != 200) {
+        
+        toast.error(error.response?.data?.message || 'Server error occurred');
+      }
     }
   };
 
@@ -116,15 +137,14 @@ function ManegementPrd() {
           >
             <option value="">Role</option>
             <option value="User">User</option>
-            <option value="owner">owner</option>
+            <option value="Admin">Admin</option>
+            <option value="Owner">Owner</option>
           </select>
         </td>
         <td>{user._id}</td>
         <td style={{ textAlign: "center" }}>
-          <button className="update" onClick={() => updateUser(user._id)}>
-            Update
-          </button>
-          <IoIosClose onClick={() => setEditMode(null)} style={{ cursor: "pointer" }} />
+          <Check onClick={() => updateUser(user._id)} style={{ color: "green", cursor: "pointer" }} size={22} />
+          <IoIosClose onClick={() => setEditMode(null)} size={22} style={{ cursor: "pointer", color: "red" }} />
         </td>
       </tr>
       
